@@ -29,14 +29,26 @@ Sub setColorScheme()
 End Sub
 
 '' FILL IN THE CATEGORY FIELD
-Function displayCategory(ByRef r As Long, ByRef c As Long)
-  catRow = r + 1
-  catCol = c + 1
-  Set catPtr = Worksheets("template").Cells(catRow, catCol)
-  catPtr.Font.Color = RGB(255, 255, 255)  '' set text color
-  catPtr.Interior.Color = RGB(0, 32, 96)  '' set cell color
-  '' dataPtr =
-  MsgBox ("displayCategory()")
+Function displayCategory(dr, dc, tr, tc)
+  '' set location and value of category field in the template tab
+  Set catLoc = Worksheets("template").Cells(tr + 1, tc + 1)
+  Set catVal = Worksheets("data").Cells(dr, dc + 1)
+  
+  '' set text color and cell color
+  catLoc.Font.Color = RGB(255, 255, 255)
+  catLoc.Interior.Color = RGB(0, 32, 96)
+  
+  '' set category name
+  catLoc.Value = catVal
+  
+  '' move location of template row to start of field-name row
+  tr = tr + 3
+  
+  '' TESTING
+  '' myString = CStr(dr) + CStr(dc) + CStr(tr) + CStr(tc) + catVal
+  '' MsgBox ("displayCategory()" + myString)
+  MsgBox ("end displayCategory")
+  '' Worksheets("template").Cells(tr, tc).Value = "Start"
 
 End Function
 
@@ -44,7 +56,9 @@ End Function
 Sub displaySubCategory()
   '' set text color : cells(i,j).Font.Color=RGB(x,y,x)
   '' set field color : cells(i,j).Interior.Color=RGB(x,y,x)
-  MsgBox ("Success !!")
+  
+  '' display message for testing purposes
+  MsgBox ("end displaySubCategory")
   
 End Sub
 
@@ -52,7 +66,9 @@ End Sub
 Sub displayFieldNames()
   '' set text color
   '' set field color
-  MsgBox ("Success !!")
+  
+  '' display message for testing purposes
+  MsgBox ("end displayFieldNames")
 
 End Sub
 
@@ -61,41 +77,66 @@ Sub populateRecord()
   
   
 End Sub
+Sub test(dr, dc, tr, tc)
+  Dim myString As String
+  myString = CStr(dr) + CStr(dc) + CStr(tr) + CStr(tc)
+  '' MsgBox (myString)
+  MsgBox ("end test")
+
+End Sub
 
 '' POPULATE THE TEMPLATE WITH DATA FROM THE PRICEBOOK
 Sub populateTemplate()
-  '' declare variables
-  Dim tRow As Long            '' current row on template tab
-  Dim tCol As Long            '' current col on template tab
-  tRow = 8                    '' set template row
-  tCol = 1                    '' set template col
-  Dim dRow As Long            '' current row on data tab
-  Dim DCol As Long            '' current col on data tab
-  dRow = 2                    '' set data row
-  DCol = 1                    '' set data tab
-  Set dataPtr = Worksheets("data").Cells(dRow, DCol)      '' ptr to cells on data tab
-  Set tempPtr = Worksheets("template").Cells(tRow, tCol)  '' ptr to cells on template tab
-  Dim trimVal As Long
-  Dim itemSufix As Long       '' ie, SLO-01 --> SLO
-  Dim itemPrefix As String    '' ie, SLO-01 --> 01
+
+  '' declare variables ------------------------------
+  '' vars for current row and col on template tab
+  Dim tRow As Long
+  Dim tCol As Long
+  tRow = 8
+  tCol = 1
   
-  '' get prefix and suffix of value in data.Item field
-  trimVal = InStr(1, dataPtr, "-") '' get position of hyphen in Item
+  '' vars for current row and col on data tab
+  Dim dRow As Long
+  Dim dCol As Long
+  dRow = 2
+  dCol = 1
+  
+  '' create iterative pointers on template tab and data tab
+  Set dataPtr = Worksheets("data").Cells(dRow, dCol)
+  Set tempPtr = Worksheets("template").Cells(tRow, tCol)
+  
+  '' capture Item suffix and prefix from data tab
+  '' the prefix will be used to determine when to call displayCategory
+  Dim trimVal As Long
+  Dim itemSufix As Long             '' ie, SLO-01 --> SLO
+  Dim itemPrefix As String          '' ie, SLO-01 --> 01
+  trimVal = InStr(1, dataPtr, "-")  '' get position of hyphen within the Item string
   itemSuffix = Right(dataPtr.Value, Len(dataPtr.Value) - trimVal)
   itemPrefix = Left(dataPtr.Value, trimVal - 1)
   
+
+  '' end declare variables --------------------------
+ 
   '' while dataPtr != ""
-    '' fill in the category field
-    displayCategory row, col
+    '' fill in the category field IF NEEDED
+    '' IF TEST THEN
+       displayCategory dRow, dCol, tRow, tCol
+    
+      '' TESTING
+      '' test dRow, dCol, tRow, tCol
+      testString = CStr(tRow) + CStr(tCol) + CStr(dRow) + CStr(dCol)
+      MsgBox ("Test String: " + testString)
+    
+    '' fill in the subCategory field if needed
   
     '' populate Item field
-    tempPtr.Value = dataPtr
+    ''tempPtr.Value = dataPtr
     '' dataPtr.Value
   
     '' test for end of record
-    col = col + 1
+    ''col = col + 1
     '' if col is null, col = 1, row = row + 1
-    dataPtr = dataPtr.Cells(row, col)
+    ''dataPtr = dataPtr.Cells(row, col)
     
     '' end while
     
