@@ -1,6 +1,5 @@
 '' VBA Pricebook Setup
 
-
 '' EXAMPLE
 Sub MySum()
   ActiveCell.Value = WorksheetFunction.Sum(Worksheets("Sales").Range("B1:B25"))
@@ -10,17 +9,17 @@ End Sub
 '' EXAMPLE
 Sub FillColC()
   For Counter = 1 To 25
-  Set curCell = Worksheets("test").Cells(Counter, 3)
-  curCell.Value = Worksheets("Sales").Cells(Counter, 2)
-  Next Counter
+    Set curCell = Worksheets("test").Cells(Counter, 3)
+    curCell.Value = Worksheets("Sales").Cells(Counter, 2)
+    Next Counter
 End Sub
 
 '' EXAMPLE
 Sub Item()
   For Counter = 1 To 25
-  Set curCell = Worksheets("template").Cells(Counter + 11, 1)
-  curCell.Value = Worksheets("Sales").Cells(Counter, 2)
-  Next Counter
+    Set curCell = Worksheets("template").Cells(Counter + 11, 1)
+    curCell.Value = Worksheets("Sales").Cells(Counter, 2)
+    Next Counter
 End Sub
 
 '' SET COLORS FOR TEXT AND CELL
@@ -30,17 +29,21 @@ Sub setColorScheme()
 End Sub
 
 '' FILL IN THE CATEGORY FIELD
-Sub displayCategory()
-  '' set text color
-  '' set field color
-  MsgBox ("Success !!")
+Function displayCategory(ByRef r As Long, ByRef c As Long)
+  catRow = r + 1
+  catCol = c + 1
+  Set catPtr = Worksheets("template").Cells(catRow, catCol)
+  catPtr.Font.Color = RGB(255, 255, 255)  '' set text color
+  catPtr.Interior.Color = RGB(0, 32, 96)  '' set cell color
+  '' dataPtr =
+  MsgBox ("displayCategory()")
 
-End Sub
+End Function
 
 '' FILL IN THE SUBCATEGORY FIELD
 Sub displaySubCategory()
-  '' set text color
-  '' set field color
+  '' set text color : cells(i,j).Font.Color=RGB(x,y,x)
+  '' set field color : cells(i,j).Interior.Color=RGB(x,y,x)
   MsgBox ("Success !!")
   
 End Sub
@@ -61,27 +64,41 @@ End Sub
 
 '' POPULATE THE TEMPLATE WITH DATA FROM THE PRICEBOOK
 Sub populateTemplate()
-  '' create pointers on template page and data page
-  Set dataPtr = Worksheets("data").Cells(2, 1)
-  Set tempPtr = Worksheets("template").Range("B9")
-  
-  '' fill in the category field
-  displayCategory
-  
-  '' create a var to hold Item prefix (ie, "SLO"), and
-  '' create a var to hold Item suffix (ie, "01")
+  '' declare variables
+  Dim tRow As Long            '' current row on template tab
+  Dim tCol As Long            '' current col on template tab
+  tRow = 8                    '' set template row
+  tCol = 1                    '' set template col
+  Dim dRow As Long            '' current row on data tab
+  Dim DCol As Long            '' current col on data tab
+  dRow = 2                    '' set data row
+  DCol = 1                    '' set data tab
+  Set dataPtr = Worksheets("data").Cells(dRow, DCol)      '' ptr to cells on data tab
+  Set tempPtr = Worksheets("template").Cells(tRow, tCol)  '' ptr to cells on template tab
   Dim trimVal As Long
-  Dim itemSufix As Long
-  Dim itemPrefix As String
-  trimVal = InStr(1, dataPtr, "-")
+  Dim itemSufix As Long       '' ie, SLO-01 --> SLO
+  Dim itemPrefix As String    '' ie, SLO-01 --> 01
+  
+  '' get prefix and suffix of value in data.Item field
+  trimVal = InStr(1, dataPtr, "-") '' get position of hyphen in Item
   itemSuffix = Right(dataPtr.Value, Len(dataPtr.Value) - trimVal)
   itemPrefix = Left(dataPtr.Value, trimVal - 1)
   
-  '' populate Item field
-  tempPtr.Value = dataPtr
-  '' dataPtr.Value
+  '' while dataPtr != ""
+    '' fill in the category field
+    displayCategory row, col
   
+    '' populate Item field
+    tempPtr.Value = dataPtr
+    '' dataPtr.Value
   
+    '' test for end of record
+    col = col + 1
+    '' if col is null, col = 1, row = row + 1
+    dataPtr = dataPtr.Cells(row, col)
+    
+    '' end while
+    
 End Sub
 Sub doSomethingWithArray()
   '' lu array : https://www.automateexcel.com/vba/array-variables/
