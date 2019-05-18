@@ -1,0 +1,40 @@
+'' VBA Pricebook Setup
+
+Sub MySum()
+  '' rem comment
+  ActiveCell.Value = WorksheetFunction.Sum(Worksheets("Sales").Range("B1:B25"))
+End Sub
+Sub CountCells()
+  '' rem comment
+End Sub
+Sub FillColC()
+  '' rem comment
+  For Counter = 1 To 25
+  Set curCell = Worksheets("test").Cells(Counter, 3)
+  curCell.Value = Worksheets("Sales").Cells(Counter, 2)
+  Next Counter
+End Sub
+Sub Item()
+  '' rem comment
+  For Counter = 1 To 25
+  Set curCell = Worksheets("template").Cells(Counter + 11, 1)
+  curCell.Value = Worksheets("Sales").Cells(Counter, 2)
+  Next Counter
+End Sub
+Sub CellColor()
+  '' rem comment
+  Worksheets("template").Range("A1").Interior.ColorIndex = 5
+End Sub
+Sub populateTemplate()
+  '' rem comment
+  Set dataPtr = Worksheets("data").Cells(2, 1)
+  Set tempPtr = Worksheets("template").Range("A12")
+  Dim trimVal As Long
+  trimVal = InStr(1, dataPtr, "-")
+  trimmedItem = Left(dataPtr.Value, trimVal - 1)
+  tempPtr.Value = dataPtr.Value
+  '' MsgBox (trimmedItem)
+End Sub
+Sub doSomethingWithArray()
+  '' lu array : https://www.automateexcel.com/vba/array-variables/
+End Sub
