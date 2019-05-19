@@ -1,27 +1,119 @@
 
 '' VBA Pricebook Scripts v2
 
-'' POPULATE THE TEMPLATE WITH DATA FROM THE PRICEBOOK
 
-Sub populateTemplate()
-  '' declare variables ------------------------------------
+Sub notes()
+  ' subs completed & tested:
+  '    subName
+  ' functions complteted & tested:
+  '    getItemPrefix()
+  '    getItemSuffix()
+
+End Sub
+
+Sub boneyard()
+  ' scraps go here
   
-  '' initialize vars for row and col on template tab
+  ' while loop
+  'Dim count As Integer
+  'count = 0
+  'Do While itemPrefix
+  '  count = count + 1
+
+    '' TEST
+   ' If count = 100 Then
+    '    MsgBox ("exiting Do While based on count")
+     '   Exit Do
+    'End If
+  'Loop
+    
+  
+End Sub
+
+Function getItemPrefix(r, c) As String
+  ' declare local variables
+  Dim trimVal As Integer
+  Dim itemPrefix As String
+  Set dataPtr = Worksheets("data").Cells(r, c)
+
+  ' 1 - return na to caller if the item field is na
+  If dataPtr.Value = "na" Then
+    getItemPrefix = "na"
+    Exit Function
+  End If
+  
+  ' 2 - return empty to caller if the item field is null
+  If dataPtr.Value = "" Then
+    getItemPrefix = "empty"
+    Exit Function
+  End If
+  
+  ' 3 - return error to caller if the item field has no hyphen
+  Dim s As Boolean
+  s = InStr(1, dataPtr, "-", 1)
+  If s = 0 Then
+    getItemPrefix = "error"
+    Exit Function
+  End If
+  
+  ' 4 - return the left side of the item field
+  trimVal = InStr(1, dataPtr, "-")                ' get loc of hyphen in Item
+  itemPrefix = Left(dataPtr.Value, trimVal - 1)   ' get left side of Item
+  getItemPrefix = itemPrefix                      ' return the prefix
+  
+End Function
+
+
+
+'' POPULATE THE TEMPLATE WITH DATA FROM THE PRICEBOOK
+Sub populateTemplate()
+  ' declare variables ------------------------------------
+  
+  ' initialize vars for row and col on template tab
   Dim tRow, tCol, dRow, dCol As Integer
   tRow = 8
   tCol = 1
   dRow = 2
   dCol = 1
   
-  '' get itemPrefix
-  '' get itemSuffix
+  '===========================================
+  ' get itemPrefix
   
-  '' while Item != "" <-- outer loop
-  ''   initialize headers:
-  ''      if nuItemPrefix != itemPrefix
-  ''      if Sub-Category != "" then displaySubCategory
-  ''      else {displayCategory and if not first run (ie, dRow > 2), displayFieldNames}
-  ''   copy and paste records from data to template:
-  ''      while nuItemPrefix == itemPrefix then cnpRecord <-- inner loop
+  ' while Item != "" <-- outer loop
+  '   initialize headers:
+  '      if nuItemPrefix != itemPrefix
+  '      if Sub-Category != "" then displaySubCategory
+  '      else {displayCategory and if not first run (ie, dRow > 2), displayFieldNames}
+  '   copy and paste records from data to template:
+  '      while nuItemPrefix == itemPrefix then cnpRecord <-- inner loop
+  '===========================================
   
+  ' get itemPrefix
+  itemPrefix = getItemPrefix(dRow, dCol)
+  
+  ' fill in the template
+  ' outer loop: do while itemPrefix is not null
+  Dim count As Integer
+  count = 0
+  Do While itemPrefix <> "" Or count < 100
+    count = count + 1
+    If count = 20 Then
+      itemPrefix = ""
+      Exit Do
+    End If
+    
+    ' inner loop: copy rows from data tab to template tab
+    '             for each itemPrefix range
+    
+    ' get itemSuffix
+    'itemSuffix = getItemSuffix(dRow, dCol)
+  Loop
+  
+  ' TEST
+  countStr = CStr(count)
+  MsgBox ("itemPrefix: " + itemPrefix + " | " + countStr)
+
+   
 End Sub
+  
+
