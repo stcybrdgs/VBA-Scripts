@@ -1,32 +1,4 @@
-'' VBA Pricebook Setup
-
-'' EXAMPLE
-Sub MySum()
-  ActiveCell.Value = WorksheetFunction.Sum(Worksheets("Sales").Range("B1:B25"))
-End Sub
-
-
-'' EXAMPLE
-Sub FillColC()
-  For Counter = 1 To 25
-    Set curCell = Worksheets("test").Cells(Counter, 3)
-    curCell.Value = Worksheets("Sales").Cells(Counter, 2)
-    Next Counter
-End Sub
-
-'' EXAMPLE
-Sub Item()
-  For Counter = 1 To 25
-    Set curCell = Worksheets("template").Cells(Counter + 11, 1)
-    curCell.Value = Worksheets("Sales").Cells(Counter, 2)
-    Next Counter
-End Sub
-
-'' SET COLORS FOR TEXT AND CELL
-Sub setColorScheme()
-  '' Worksheets("template").Range("A1").Interior.ColorIndex = 5
-  '' rem blue = rgb(0, 32, 96)
-End Sub
+'' VBA Pricebook Scripts
 
 '' FILL IN THE CATEGORY FIELD
 Function displayCategory(dr, dc, tr, tc)
@@ -77,60 +49,100 @@ Sub populateRecord()
   
   
 End Sub
-Sub test(dr, dc, tr, tc)
-  Dim myString As String
-  myString = CStr(dr) + CStr(dc) + CStr(tr) + CStr(tc)
-  '' MsgBox (myString)
-  MsgBox ("end test")
+
+'' COPY AND PASTE FIELD-NAME ROW FROM TOP OF TEMPLATE TAB
+Sub cnpFieldNames()
+  Range("A11", Range("A11").End(xlToRight)).Copy Worksheets("template").Range("A12")
+
+  '' msg box test
+  MsgBox ("end cnpFieldNames")
+  
+End Sub
+
+'' TESTING
+Sub testMsg(dr, dc, tr, tc)
+  Dim testString As String
+  testString = CStr(tr) + " " + CStr(tc) + " " + CStr(dr) + " " + CStr(dc) + " "
+  MsgBox ("end testString: " + testString)
 
 End Sub
+Function isEndOfItem(itemSuffix, dr, dc)
+  '' IF isEndOfItem itemSuffix dRow, dCol
+  '' nuItemSuffix =
+  '' return True
+  '' Else return False
+  
+End Function
+
+Function getSuffix(r, c) As String
+  Set dataPtr = Worksheets("data").Cells(r, c)
+  Dim trimVal As Long
+  Dim suffix As String
+  trimVal = InStr(1, dataPtr, "-")
+  getSuffix = Right(dataPtr.Value, Len(dataPtr.Value - trimVal))
+  
+End Function
+
 
 '' POPULATE THE TEMPLATE WITH DATA FROM THE PRICEBOOK
 Sub populateTemplate()
-
-  '' declare variables ------------------------------
-  '' vars for current row and col on template tab
+  '' activate the template tab
+  Worksheets("template").Activate
+  
+  '' declare variables ------------------------------------
+  '' initialize vars for row and col on template tab
   Dim tRow As Long
   Dim tCol As Long
   tRow = 8
   tCol = 1
   
-  '' vars for current row and col on data tab
+  '' initialize vars for row and col on data tab
   Dim dRow As Long
   Dim dCol As Long
   dRow = 2
   dCol = 1
   
-  '' create iterative pointers on template tab and data tab
+  '' set active cell location on template tab and data tab
   Set dataPtr = Worksheets("data").Cells(dRow, dCol)
-  Set tempPtr = Worksheets("template").Cells(tRow, tCol)
+  '' Set tempPtr = Worksheets("template").Cells(tRow, tCol)
   
   '' capture Item suffix and prefix from data tab
   '' the prefix will be used to determine when to call displayCategory
   Dim trimVal As Long
-  Dim itemSufix As Long             '' ie, SLO-01 --> SLO
+  Dim itemSufix As String           '' ie, SLO-01 --> SLO
   Dim itemPrefix As String          '' ie, SLO-01 --> 01
   trimVal = InStr(1, dataPtr, "-")  '' get position of hyphen within the Item string
   itemSuffix = Right(dataPtr.Value, Len(dataPtr.Value) - trimVal)
   itemPrefix = Left(dataPtr.Value, trimVal - 1)
   
-
-  '' end declare variables --------------------------
- 
+  '' end declare variables --------------------------------
+  
   '' while dataPtr != ""
-    '' fill in the category field IF NEEDED
-    '' IF TEST THEN
-       displayCategory dRow, dCol, tRow, tCol
+  '' fill in the category field IF NEEDED
+    displayCategory dRow, dCol, tRow, tCol
+
     
-      '' TESTING
-      '' test dRow, dCol, tRow, tCol
-      testString = CStr(tRow) + CStr(tCol) + CStr(dRow) + CStr(dCol)
-      MsgBox ("Test String: " + testString)
+    '' TESTING
+    testMsg dRow, dCol, tRow, tCol
     
     '' fill in the subCategory field if needed
   
+    '' if tRow > 11 on template tab
+    '' and dRow has reached the end of an Item grouping on data tab
+    '' then create a new row of field names in template tab
+    '' nuDataRow = isEndOfItem itemSuffix dRow, dCol
+    '' If tRow > 11 And nuDataRow == True Then
+    cnpFieldNames
+    
+    '' TESTING
+    testMsg dRow, dCol, tRow, tCol
+    
+    itemSuffix = getSuffix dRow, dCol
+    Dim msg As String
+    msg = dataPtr.Value
+    MsgBox (dataPtr)
+  
     '' populate Item field
-    ''tempPtr.Value = dataPtr
     '' dataPtr.Value
   
     '' test for end of record
