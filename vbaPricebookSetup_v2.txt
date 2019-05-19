@@ -30,11 +30,17 @@ Sub boneyard()
   
 End Sub
 
-Function getItemPrefix(r, c) As String
+Function getItemPrefix(r, c, flag) As String
   ' declare local variables
   Dim trimVal As Integer
   Dim itemPrefix As String
   Set dataPtr = Worksheets("data").Cells(r, c)
+  
+  ' 0 - return "start" if flag is True
+  If flag = True Then
+    getItemPrefix = "start"
+    Exit Function
+  End If
 
   ' 1 - return na to caller if the item field is na
   If dataPtr.Value = "na" Then
@@ -78,6 +84,7 @@ Sub populateTemplate()
   
   '===========================================
   ' get itemPrefix
+  ' get category
   
   ' while Item != "" <-- outer loop
   '   initialize headers:
@@ -88,32 +95,78 @@ Sub populateTemplate()
   '      while nuItemPrefix == itemPrefix then cnpRecord <-- inner loop
   '===========================================
   
+  ' set start flag to indicate first run
+  Dim startFlag As Boolean
+  startFlag = True
+
   ' get itemPrefix
-  itemPrefix = getItemPrefix(dRow, dCol)
+  itemPrefix = getItemPrefix(dRow, dCol, startFlag)
+  startFlag = False
   
-  ' fill in the template
-  ' outer loop: do while itemPrefix is not null
+  ' declare currItemPrefix
+  ' will be used to evaluate conditions against itemPrefix
+  Dim currItemPrefix As String
+  
+  ' get category -- To Do
+  ' code goes here
+  
+  ' TEST create counter to control loop
   Dim count As Integer
   count = 0
-  Do While itemPrefix <> "" Or count < 100
+  ' end test
+  
+  ' outer loop: do while itemPrefix is not null
+  Do While itemPrefix <> "empty" Or count < 100
+    
+    ' TEST
     count = count + 1
-    If count = 20 Then
+    If count = 3 Then
       itemPrefix = ""
       Exit Do
     End If
+    ' end test
     
-    ' inner loop: copy rows from data tab to template tab
-    '             for each itemPrefix range
+    currItemPrefix = getItemPrefix(dRow, dCol, startFlag)
     
-    ' get itemSuffix
-    'itemSuffix = getItemSuffix(dRow, dCol)
-  Loop
+    '
+    '   If currItemPrefix <> itemPrefix And currCategory <> category Then
+    '       insert category header and promote tRow
+    '       insert field-name row and promote tRow
+    '     End If
+    '
+    '     If currItemPrefix <> itemPrefix And subCategory <> "" Then
+    '       insert subCat header and promote tRow
+    '     End If
+    '
+    '
+    '   Do While currItemPrefix = itemPrefix
+    '     Insert HEADERS
+    '
+    '     INSERT RECORDS
+    '
+    '       '   copy rows from data tab to template tab for each itemPrefix
+    '
+    '   if currItemPrefix = itemPrefix Then copy and paste row from data tab to template tab
+    '   promote tRow, dRow
+    '
+    '
+    ' TEST
+         countStr = CStr(count)
+         MsgBox (currItemPrefix + " | " + itemPrefix + " | " + countStr) ' TEST
+    ' End Test
+    '
+    
+    itemPrefix = currItemPrefix
   
-  ' TEST
-  countStr = CStr(count)
-  MsgBox ("itemPrefix: " + itemPrefix + " | " + countStr)
+  Loop
 
-   
+  ' message success and end sub
+    '
+    ' TEST
+         MsgBox (currItemPrefix + " | " + itemPrefix + " | " + countStr) ' TEST
+    ' End Test
+    '
+
 End Sub
   
 
