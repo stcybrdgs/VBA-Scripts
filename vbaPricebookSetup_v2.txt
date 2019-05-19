@@ -1,7 +1,88 @@
-
 '' VBA Pricebook Scripts v2
 
+Public lastRow As String
 
+
+'' clear the contents of the template
+Sub clearTemplate()
+  Dim rangeStr As String
+  rangeStr = "A12:" + "H" + lastRow
+  
+  ' clear the header at B9
+  Worksheets("template").Range("B9").Interior.Color = xlNone
+  Worksheets("template").Range("B9").Borders.LineStyle = xlLineStyleNone
+  Worksheets("template").Range("B9").Clear
+  
+  ' clear the rest of the template
+  Worksheets("template").Range(rangeStr).Interior.Color = xlNone
+  Worksheets("template").Range(rangeStr).Borders.LineStyle = xlLineStyleNone
+  Worksheets("template").Range(rangeStr).Clear
+End Sub
+
+Sub insertRecord(dr, dc, tr, tc)
+  Dim count As Integer
+  count = 1
+  
+  While count <= 10
+    Set dataPtr = Worksheets("data").Cells(dr, dc)
+    Set tempPtr = Worksheets("template").Cells(tr, tc)
+    
+    If tc = 1 Then
+      tempPtr.Font.Color = RGB(255, 255, 255)
+      tempPtr.Interior.Color = RGB(0, 32, 96)
+    Else
+      tempPtr.Font.Color = RGB(0, 0, 0)
+      tempPtr.Interior.Color = RGB(255, 255, 255)
+    End If
+    If count <> 2 And count <> 3 Then
+      tempPtr.Value = dataPtr.Value
+      tc = tc + 1
+      dc = dc + 1
+    Else
+      dc = dc + 1
+    End If
+    
+    ' create borders
+    Dim rangeStr As String
+    rangeStr = "A" + CStr(tr) + ":" + "H" + CStr(tr)
+    Worksheets("template").Range(rangeStr).Borders.LineStyle = xlContinuous
+    
+    ' increment counter
+    count = count + 1
+  Wend
+  
+  dc = 1
+  tc = 1
+  
+End Sub
+Sub insertFieldNameRow(tr, tc)
+  If tr = 11 Then
+    tr = tr + 1
+    Exit Sub
+  End If
+  
+  Dim templateLoc As String
+  templateLoc = "A" + CStr(tr)
+  Range("A11", Range("A11").End(xlToRight)).Copy Worksheets("template").Range(templateLoc)
+  
+End Sub
+
+Sub insertCategoryHeader(dr, dc, tr, tc)
+  '' set location and value of category field in the template tab
+  Set catLoc = Worksheets("template").Cells(tr + 1, tc + 1)
+  Set catVal = Worksheets("data").Cells(dr, dc + 1)
+  
+  '' set text color and cell color
+  catLoc.Font.Color = RGB(255, 255, 255)
+  catLoc.Interior.Color = RGB(0, 32, 96)
+  
+  '' set category name
+  catLoc.Value = catVal
+  
+  '' move location of template row to start of field-name row
+  tr = tr + 3
+  
+End Sub
 
 Sub notes()
   ' subs completed & tested:
@@ -80,6 +161,7 @@ Function getItemPrefix(r, c, flag) As String
   
 End Function
 
+
 '' POPULATE THE TEMPLATE WITH DATA FROM THE PRICEBOOK
 Sub populateTemplate()
   ' declare initial local variables ====================================
@@ -88,7 +170,7 @@ Sub populateTemplate()
   Dim tRow, tCol, dRow, dCol As Integer
   tRow = 8
   tCol = 1
-  dRow = 35
+  dRow = 2
   dCol = 1
   
   ' set start flag to signal first run
@@ -111,19 +193,6 @@ Sub populateTemplate()
   startFlag = False
   
   ' end declare initial local variables ====
-  
-    '===========================================
-  ' get itemPrefix
-  ' get category
-  
-  ' while Item != "" <-- outer loop
-  '   initialize headers:
-  '      if nuItemPrefix != itemPrefix
-  '      if Sub-Category != "" then displaySubCategory
-  '      else {displayCategory and if not first run (ie, dRow > 2), displayFieldNames}
-  '   copy and paste records from data to template:
-  '      while nuItemPrefix == itemPrefix then cnpRecord <-- inner loop
-  '===========================================
     
   ' outer loop: do while itemPrefix is not null ===========================
   ' TEST create counter to control loop
@@ -132,54 +201,42 @@ Sub populateTemplate()
   ' end test
   
   ' loop start
-  Do While itemPrefix <> "empty" Or count < 100
+  Do While itemPrefix <> "empty" Or count < 120
     
     ' TEST
     count = count + 1
-    If count = 6 Then
+    If count = 120 Then
       itemPrefix = ""
       Exit Do
     End If
     ' end test
     
+    ' get current values from data tab
     currItemPrefix = getItemPrefix(dRow, dCol, startFlag)
     currCategory = getCategory(dRow, dCol, startFlag)
     currSubCategory = getSubCategory(dRow, dCol, startFlag)
     
-    ' TEST
-    Dim ct, tr, dr As String
-    ct = CStr(count)
-    tr = CStr(tRow)
-    dr = CStr(dRow)
-    ip = itemPrefix
-    cip = currItemPrefix
-    cat = category
-    cCat = currCategory
-    cSubCat = currSubCategory
-    MsgBox (ct + "  " + ip + " " + cip + " " + c + " " + cc + " " + tr + " " + dr)
-    
-
     ' insert category header if needed
     If currItemPrefix <> itemPrefix And currCategory <> category Then
-      ' insert category header and promote tRow
-      MsgBox ("insert category  |  promote tRow")
-      tRow = tRow + 3
-      
+      Call insertCategoryHeader(dRow, dCol, tRow, tCol)
+      ' MsgBox ("insert category  |  promote tRow")
+             
       ' insert field-names header and promote tRow
-      MsgBox ("insert field-name row  |  promote tRow")
+      Call insertFieldNameRow(tRow, tCol)
+      ' MsgBox ("insert field-name row  |  promote tRow")
       tRow = tRow + 1
     End If
     
     ' insert subcategory header if needed
     If currItemPrefix <> itemPrefix And currSubCategory <> subCategory Then
       ' insert subCat header and promote tRow
-      MsgBox ("insert subCat  |  promote tRow")
+      ' MsgBox ("insert subCat  |  promote tRow")
       tRow = tRow + 1
     End If
     
     ' insert records if needed
     If currItemPrefix = itemPrefix Then
-      MsgBox ("insert record | promote tRow & dRow")
+      Call insertRecord(dRow, dCol, tRow, tCol)
       tRow = tRow + 1
       dRow = dRow + 1
     '
@@ -196,14 +253,19 @@ Sub populateTemplate()
     subCategory = currSubCategory
   
   Loop
+  
+  lastRow = CStr(tRow)
 
   ' message success and end sub
     '
     ' TEST
-         MsgBox (currItemPrefix + " | " + itemPrefix + " | " + countStr) ' TEST
+         Dim countStr As String
+         countStr = CStr(count)
+         MsgBox (currItemPrefix + " | " + itemPrefix + " | " + countStr + " | " + lastRow) ' TEST
     ' End Test
     '
 
 End Sub
   
+
 
