@@ -1,0 +1,27 @@
+
+'' VBA Pricebook Scripts v2
+
+'' POPULATE THE TEMPLATE WITH DATA FROM THE PRICEBOOK
+
+Sub populateTemplate()
+  '' declare variables ------------------------------------
+  
+  '' initialize vars for row and col on template tab
+  Dim tRow, tCol, dRow, dCol As Integer
+  tRow = 8
+  tCol = 1
+  dRow = 2
+  dCol = 1
+  
+  '' get itemPrefix
+  '' get itemSuffix
+  
+  '' while Item != "" <-- outer loop
+  ''   initialize headers:
+  ''      if nuItemPrefix != itemPrefix
+  ''      if Sub-Category != "" then displaySubCategory
+  ''      else {displayCategory and if not first run (ie, dRow > 2), displayFieldNames}
+  ''   copy and paste records from data to template:
+  ''      while nuItemPrefix == itemPrefix then cnpRecord <-- inner loop
+  
+End Sub
