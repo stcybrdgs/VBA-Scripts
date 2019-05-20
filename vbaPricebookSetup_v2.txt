@@ -2,6 +2,16 @@
 
 Public lastRow As String
 
+Sub formatTemplate()
+  Dim rangeStr As String
+  rangeStr = "A12:" + "H" + lastRow
+  
+  Worksheets("template").Range(rangeStr).Font.Size = 16
+  Worksheets("template").Range(rangeStr).Font.Name = "Calibri"
+  Worksheets("template").Range("B9").Font.Size = 16
+  Worksheets("template").Range("B9").Font.Name = "Calibri"
+
+End Sub
 
 '' clear the contents of the template
 Sub clearTemplate()
@@ -17,6 +27,7 @@ Sub clearTemplate()
   Worksheets("template").Range(rangeStr).Interior.Color = xlNone
   Worksheets("template").Range(rangeStr).Borders.LineStyle = xlLineStyleNone
   Worksheets("template").Range(rangeStr).Clear
+  
 End Sub
 
 Sub insertRecord(dr, dc, tr, tc)
@@ -55,6 +66,7 @@ Sub insertRecord(dr, dc, tr, tc)
   tc = 1
   
 End Sub
+
 Sub insertFieldNameRow(tr, tc)
   If tr = 11 Then
     tr = tr + 1
@@ -74,6 +86,7 @@ Sub insertCategoryHeader(dr, dc, tr, tc)
   
   '' set text color and cell color
   catLoc.Font.Color = RGB(255, 255, 255)
+  catLoc.Font.Bold = True
   catLoc.Interior.Color = RGB(0, 32, 96)
   
   '' set category name
@@ -164,8 +177,7 @@ End Function
 
 '' POPULATE THE TEMPLATE WITH DATA FROM THE PRICEBOOK
 Sub populateTemplate()
-  ' declare initial local variables ====================================
-  
+  ' declare initial local variables ============================
   ' initialize vars for row and col on template tab
   Dim tRow, tCol, dRow, dCol As Integer
   tRow = 8
@@ -192,9 +204,8 @@ Sub populateTemplate()
   ' flip start flag to false
   startFlag = False
   
-  ' end declare initial local variables ====
     
-  ' outer loop: do while itemPrefix is not null ===========================
+  ' load data into template table ===============================
   ' TEST create counter to control loop
   Dim count As Integer
   count = 0
@@ -202,7 +213,6 @@ Sub populateTemplate()
   
   ' loop start
   Do While itemPrefix <> "empty" Or count < 120
-    
     ' TEST
     count = count + 1
     If count = 120 Then
@@ -239,12 +249,6 @@ Sub populateTemplate()
       Call insertRecord(dRow, dCol, tRow, tCol)
       tRow = tRow + 1
       dRow = dRow + 1
-    '
-    '   copy rows from data tab to template tab for each itemPrefix
-    '
-    '   if currItemPrefix = itemPrefix Then copy and paste row from data tab to template tab
-    '   promote tRow, dRow
-    '
     End If
     
     ' reset item prefix and category vars
@@ -256,16 +260,17 @@ Sub populateTemplate()
   
   lastRow = CStr(tRow)
 
+  Call formatTemplate
+  
   ' message success and end sub
-    '
-    ' TEST
-         Dim countStr As String
-         countStr = CStr(count)
-         MsgBox (currItemPrefix + " | " + itemPrefix + " | " + countStr + " | " + lastRow) ' TEST
-    ' End Test
-    '
+  MsgBox ("The Pricebook is done loading.")
+
+  ' TEST
+    Dim countStr As String
+    countStr = CStr(count)
+    MsgBox (currItemPrefix + " | " + itemPrefix + " | " + countStr + " | " + lastRow) ' TEST
+  ' End Test
 
 End Sub
   
-
 
